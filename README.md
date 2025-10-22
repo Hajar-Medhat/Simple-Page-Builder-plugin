@@ -98,12 +98,12 @@ curl -X POST http://localhost/wordpress/wp-json/pagebuilder/v1/create-pages   -H
   "created": 2,
   "pages": [
     {
-      "id": 45,
+      "id": ,
       "title": "About Us",
       "url": "http://localhost/wordpress/about-us/"
     },
     {
-      "id": 46,
+      "id": ,
       "title": "Contact",
       "url": "http://localhost/wordpress/contact/"
     }
