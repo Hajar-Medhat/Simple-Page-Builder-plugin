@@ -122,8 +122,12 @@ curl -X POST http://localhost/wordpress/wp-json/pagebuilder/v1/create-pages   -H
 
 
 ---
+## License
 
+This plugin is licensed under the GNU General Public License v2 (GPL-2.0) or later.  
+You are free to modify and redistribute it under the same license terms.
 
+---
 ## Author
 
 **Hajar Medhat**  
