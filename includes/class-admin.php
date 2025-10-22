@@ -55,7 +55,7 @@ class SPB_Admin {
             echo '<div class="updated"><p>API key revoked.</p></div>';
         }
 
-        $keys = $this->auth->get_api_keys();
+        $keys = [];
         ?>
         <div class="wrap">
             <h1><?php _e( 'Simple Page Builder – API Keys', 'simple-page-builder' ); ?></h1>
