@@ -40,12 +40,15 @@ class SPB_Admin {
         }
 
         // Handle key generation
-        if ( isset( $_POST['spb_generate_key'] ) && ! empty( $_POST['key_name'] ) ) {
-    check_admin_referer( 'spb_generate_key_action' );
-    echo '<div class="updated"><p><strong>Test API Key for Local Environment:</strong></p>';
-    echo '<p><strong>API Key:</strong> test_key<br>';
-    echo '<strong>Secret:</strong> test_secret</p>';
-    echo '<p><em>Use these credentials for local API testing.</em></p></div>';
+       if ( isset($_POST['spb_generate_key']) && !empty($_POST['key_name']) ) {
+    check_admin_referer('spb_generate_key_action');
+
+    $result = $this->auth->generate_api_key( sanitize_text_field($_POST['key_name']) );
+
+    echo '<div class="updated"><p><strong>API Key Created!</strong></p>';
+    echo '<p><strong>API Key:</strong> ' . esc_html( $result['api_key'] ) . '<br>';
+    echo '<strong>Secret:</strong> ' . esc_html( $result['secret'] ) . '</p>';
+    echo '<p><em>' . esc_html( $result['message'] ) . '</em></p></div>';
 }
 
         // Handle revocation
