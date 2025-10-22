@@ -118,9 +118,8 @@ curl -X POST http://localhost/wordpress/wp-json/pagebuilder/v1/create-pages   -H
 | Issue | Cause | Solution |
 |-------|--------|-----------|
 | {"error":"Missing authentication headers."} | Missing API key or secret headers | Add X-API-KEY and X-API-SECRET headers |
-| rest_no_route | Incorrect endpoint | Use /wp-json/pagebuilder/v1/create-pages |
 | 404 Error | Permalinks not refreshed | Go to Settings → Permalinks → Save Changes |
-| Plugin not activating | Missing or misnamed include files | Check the /includes folder |
+
 
 ---
 
