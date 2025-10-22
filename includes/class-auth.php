@@ -1,7 +1,7 @@
 <?php
 /**
  * SPB_Auth class for local testing and production use.
- * Automatically uses DB if available, falls back to fixed test key if table is missing.
+ * Handles API key generation, validation, revocation, and listing.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -12,30 +12,27 @@ class SPB_Auth {
 
     private $valid_key    = 'test_key';
     private $valid_secret = 'test_secret';
-    private $is_local     = true; // default to local/test mode
+    private $is_local     = true;
     private $table_name;
 
     public function __construct() {
         global $wpdb;
         $this->table_name = $wpdb->prefix . 'spb_api_keys';
 
-        // Check if DB table exists
+        // Detect if the table exists
         $table_exists = $wpdb->get_var( "SHOW TABLES LIKE '{$this->table_name}'" ) === $this->table_name;
-
-        // If table exists, use DB keys (production mode)
-        $this->is_local = !$table_exists;
+        $this->is_local = !$table_exists; // If no table, assume local
     }
 
     /**
-     * Generate a new API key
+     * Generate a new API key (DB-backed for production)
      */
     public function generate_api_key( $key_name ) {
         if ( $this->is_local ) {
-            // Table missing or local: fallback test key
             return [
                 'api_key' => $this->valid_key,
                 'secret'  => $this->valid_secret,
-                'message' => __( 'Local/test environment: fixed credentials.', 'simple-page-builder' ),
+                'message' => __( 'Local test environment: fixed credentials.', 'simple-page-builder' ),
             ];
         }
 
@@ -76,7 +73,6 @@ class SPB_Auth {
         }
 
         if ( $this->is_local ) {
-            // Table missing: fallback validation
             if ( $api_key === $this->valid_key && $secret === $this->valid_secret ) {
                 return [
                     'valid'    => true,
@@ -114,21 +110,50 @@ class SPB_Auth {
     }
 
     /**
-     * List API keys (for admin)
+     * Revoke an API key
      */
-    public function get_api_keys() {
-        if ( $this->is_local ) {
-            return [
-                (object)[
-                    'key_name' => 'Local Test Key',
-                    'api_key_hash' => '',
-                    'secret_hash' => '',
-                    'status' => 'active',
-                ]
-            ];
+    public function revoke_api_key( $id ) {
+        global $wpdb;
+
+        $table_exists = $wpdb->get_var( "SHOW TABLES LIKE '{$this->table_name}'" ) === $this->table_name;
+        if ( ! $table_exists ) {
+            return false;
         }
 
+        return $wpdb->update(
+            $this->table_name,
+            [
+                'revoked' => 1,
+                'status'  => 'revoked',
+            ],
+            ['id' => intval($id)],
+            ['%d','%s'],
+            ['%d']
+        );
+    }
+
+    /**
+     * Get all API keys
+     */
+    public function get_api_keys() {
         global $wpdb;
-        return $wpdb->get_results( "SELECT * FROM {$this->table_name} ORDER BY id DESC" );
+
+        $table_exists = $wpdb->get_var( "SHOW TABLES LIKE '{$this->table_name}'" ) === $this->table_name;
+        if ( $table_exists ) {
+            return $wpdb->get_results( "SELECT * FROM {$this->table_name} ORDER BY id DESC" );
+        }
+
+        // Local fallback key
+        return [
+            (object)[
+                'id' => 1,
+                'key_name' => 'Local Test Key',
+                'status' => 'active',
+                'created_at' => date('Y-m-d H:i:s'),
+                'last_used' => null,
+                'request_count' => 0,
+                'revoked' => 0,
+            ]
+        ];
     }
 }
