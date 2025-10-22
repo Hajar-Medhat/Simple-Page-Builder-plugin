@@ -123,11 +123,6 @@ curl -X POST http://localhost/wordpress/wp-json/pagebuilder/v1/create-pages   -H
 
 ---
 
-## License
-
-This project is licensed under the MIT License.
-
----
 
 ## Author
 
