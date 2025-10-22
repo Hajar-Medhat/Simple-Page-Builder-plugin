@@ -40,16 +40,16 @@ class SPB_Admin {
         }
 
         // Handle key generation
-       if ( isset($_POST['spb_generate_key']) && !empty($_POST['key_name']) ) {
-    check_admin_referer('spb_generate_key_action');
+        if ( isset($_POST['spb_generate_key']) && !empty($_POST['key_name']) ) {
+            check_admin_referer('spb_generate_key_action');
 
-    $result = $this->auth->generate_api_key( sanitize_text_field($_POST['key_name']) );
+            $result = $this->auth->generate_api_key( sanitize_text_field($_POST['key_name']) );
 
-    echo '<div class="updated"><p><strong>API Key Created!</strong></p>';
-    echo '<p><strong>API Key:</strong> ' . esc_html( $result['api_key'] ) . '<br>';
-    echo '<strong>Secret:</strong> ' . esc_html( $result['secret'] ) . '</p>';
-    echo '<p><em>' . esc_html( $result['message'] ) . '</em></p></div>';
-}
+            echo '<div class="updated"><p><strong>API Key Created!</strong></p>';
+            echo '<p><strong>API Key:</strong> ' . esc_html( $result['api_key'] ) . '<br>';
+            echo '<strong>Secret:</strong> ' . esc_html( $result['secret'] ) . '</p>';
+            echo '<p><em>' . esc_html( $result['message'] ) . '</em></p></div>';
+        }
 
         // Handle revocation
         if ( isset( $_GET['revoke_key'] ) && is_numeric( $_GET['revoke_key'] ) ) {
@@ -57,8 +57,10 @@ class SPB_Admin {
             echo '<div class="updated"><p>API key revoked.</p></div>';
         }
 
-        $keys = [];
+        // Fetch all keys from DB or fallback local key
+        $keys = $this->auth->get_api_keys();
         ?>
+
         <div class="wrap">
             <h1><?php _e( 'Simple Page Builder – API Keys', 'simple-page-builder' ); ?></h1>
 
@@ -89,15 +91,15 @@ class SPB_Admin {
                     <?php if ( ! empty( $keys ) ) : ?>
                         <?php foreach ( $keys as $key ) : ?>
                             <tr>
-                                <td><?php echo esc_html( $key->id ); ?></td>
+                                <td><?php echo esc_html( $key->id ?? 1 ); ?></td>
                                 <td><?php echo esc_html( $key->key_name ); ?></td>
                                 <td><?php echo esc_html( ucfirst( $key->status ) ); ?></td>
-                                <td><?php echo esc_html( $key->created_at ); ?></td>
+                                <td><?php echo esc_html( $key->created_at ?? '-' ); ?></td>
                                 <td><?php echo esc_html( $key->last_used ?? '-' ); ?></td>
-                                <td><?php echo esc_html( $key->request_count ); ?></td>
+                                <td><?php echo esc_html( $key->request_count ?? 0 ); ?></td>
                                 <td>
-                                    <?php if ( ! $key->revoked ) : ?>
-                                        <a href="<?php echo esc_url( add_query_arg( [ 'page' => 'spb-admin', 'revoke_key' => $key->id ] ) ); ?>" class="button">Revoke</a>
+                                    <?php if ( empty($key->revoked) || $key->revoked == 0 ) : ?>
+                                        <a href="<?php echo esc_url( add_query_arg( [ 'page' => 'spb-admin', 'revoke_key' => $key->id ?? 1 ] ) ); ?>" class="button">Revoke</a>
                                     <?php else : ?>
                                         Revoked
                                     <?php endif; ?>
