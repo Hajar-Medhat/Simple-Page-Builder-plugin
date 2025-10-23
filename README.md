@@ -5,7 +5,7 @@ It includes **API authentication**, **admin key management**, **webhook support*
 
 ---
 
-## 🚀 Features
+##  Features
 
 ✅ Create multiple pages through a REST API endpoint  
 ✅ Secure API key and secret authentication  
@@ -16,7 +16,7 @@ It includes **API authentication**, **admin key management**, **webhook support*
 
 ---
 
-## 📁 Directory Structure
+##  Directory Structure
 
 ```
 simple-page-builder/
@@ -55,7 +55,7 @@ simple-page-builder/
 
 ---
 
-## 🔑 Generating an API Key
+##  Generating an API Key
 
 1. Go to **Page Builder → API Keys** in your WordPress admin panel.  
 2. Enter a key name (e.g., “My Integration”) and click **Generate**.  
@@ -65,7 +65,7 @@ simple-page-builder/
 
 ---
 
-## 🌐 REST API Endpoint
+##  REST API Endpoint
 
 **URL:**  
 ```
@@ -146,7 +146,7 @@ The payload will appear instantly in your webhook receiver.
 
 ---
 
-### 📦 Example Webhook Payload
+###  Example Webhook Payload
 
 ```json
 {
@@ -183,7 +183,7 @@ You can verify this signature using your **Webhook Secret** on your receiving se
 
 ---
 
-## 🧑‍💻 Local Testing Tips
+##  Local Testing Tips
 
 You can test your REST API and webhooks locally using:
 - **[LocalWP](https://localwp.com)** or **XAMPP**
@@ -195,14 +195,14 @@ You can test your REST API and webhooks locally using:
 
 ---
 
-## 📄 License
+##  License
 
 This plugin is licensed under the **GNU General Public License v2 (GPL-2.0)** or later.  
 You are free to modify and redistribute it under the same license.
 
 ---
 
-## 👩‍💻 Author
+## Author
 
 **Hajar Medhat**  
 🔗 [GitHub Profile](https://github.com/Hajar-Medhat)
