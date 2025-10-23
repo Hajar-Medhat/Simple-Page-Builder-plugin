@@ -36,7 +36,7 @@ simple-page-builder/
 
 ---
 
-## ⚙️ Installation
+##  Installation
 
 1. **Download or clone** the repository:
    ```bash
