@@ -14,14 +14,18 @@ class SPB_Admin {
         add_action( 'admin_post_spb_save_webhook', [ $this, 'handle_save_webhook' ] );
     }
 
+    /**
+     * ✅ Add the plugin menu directly in the main sidebar
+     */
     public function add_menu_page() {
-        add_submenu_page(
-            'tools.php',
-            'Page Builder',
-            'Page Builder',
-            'manage_options',
-            'spb-settings',
-            [ $this, 'render_admin_page' ]
+        add_menu_page(
+            'Simple Page Builder',                // Page title
+            'Page Builder',                      // Menu title
+            'manage_options',                    // Capability
+            'spb-settings',                      // Menu slug
+            [ $this, 'render_admin_page' ],      // Callback
+            'dashicons-admin-page',              // Icon (WordPress dashicon)
+            25                                   // Position in sidebar
         );
     }
 
@@ -136,7 +140,9 @@ class SPB_Admin {
                 <?php if ( isset( $_GET['saved'] ) ) : ?>
                     <div class="notice notice-success is-dismissible"><p>Webhook settings saved successfully.</p></div>
                 <?php elseif ( isset( $_GET['test_sent'] ) ) : ?>
-                    <div class="notice notice-success is-dismissible"><p>✅ Test webhook sent! Check your Webhook.site page.</p></div>
+                    <div class="notice notice-success is-dismissible"><p>✅ Test webhook sent successfully! Check your Webhook.site page.</p></div>
+                <?php elseif ( isset( $_GET['test_failed'] ) ) : ?>
+                    <div class="notice notice-error is-dismissible"><p>❌ Test webhook failed to send. Please verify your Webhook URL.</p></div>
                 <?php endif; ?>
 
             <?php endif; ?>
@@ -154,7 +160,7 @@ class SPB_Admin {
             'new_key'  => 1,
             'api_key'  => urlencode( $new_key['api_key'] ),
             'secret'   => urlencode( $new_key['secret'] ),
-        ], admin_url( 'tools.php' ) );
+        ], admin_url( 'admin.php' ) );
 
         wp_redirect( $url );
         exit;
@@ -165,7 +171,7 @@ class SPB_Admin {
         $key_id = intval( $_POST['key_id'] ?? 0 );
         $this->auth->revoke_api_key( $key_id );
 
-        wp_redirect( admin_url( 'tools.php?page=spb-settings&tab=keys' ) );
+        wp_redirect( admin_url( 'admin.php?page=spb-settings&tab=keys' ) );
         exit;
     }
 
@@ -179,25 +185,18 @@ class SPB_Admin {
 
         // ✅ Send test webhook if requested
         if ( isset( $_POST['test_webhook'] ) ) {
-            $payload = [
-                'event'     => 'test_event',
-                'timestamp' => current_time( 'c' ),
-                'message'   => 'This is a test webhook from Simple Page Builder.',
-                'site'      => get_bloginfo( 'name' ),
-                'admin'     => wp_get_current_user()->user_email,
-            ];
+            $webhook = new SPB_Webhook();
+            $result = $webhook->send_test_webhook();
 
-            wp_remote_post( $settings['webhook_url'], [
-                'headers' => [ 'Content-Type' => 'application/json' ],
-                'body'    => wp_json_encode( $payload ),
-                'timeout' => 10,
-            ]);
-
-            wp_redirect( admin_url( 'tools.php?page=spb-settings&tab=webhook&test_sent=1' ) );
+            if ( is_wp_error( $result ) ) {
+                wp_redirect( admin_url( 'admin.php?page=spb-settings&tab=webhook&test_failed=1' ) );
+            } else {
+                wp_redirect( admin_url( 'admin.php?page=spb-settings&tab=webhook&test_sent=1' ) );
+            }
             exit;
         }
 
-        wp_redirect( admin_url( 'tools.php?page=spb-settings&tab=webhook&saved=1' ) );
+        wp_redirect( admin_url( 'admin.php?page=spb-settings&tab=webhook&saved=1' ) );
         exit;
     }
 }
